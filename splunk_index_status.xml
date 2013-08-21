@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Splunk index status</label>
+  <row>
+    <table>
+      <searchString>| getindex | table Index IsInternal "RetentionTime (Days)" CurrentSizeMB IndexPath ArchiveDirectory FirstEvent LatestEvent</searchString>
+      <title>Index status</title>
+      <option name="count">100</option>
+    </table>
+  </row>
+</dashboard>
