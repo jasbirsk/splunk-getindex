@@ -1,0 +1,32 @@
+Splunk-getindex
+Author: Bojan Zdrnja, <bojan.zdrnja@infigo.hr>
+
+Want to see full status of your indexes, including retention periods?
+Splunk-getindex is the right command for you!
+
+This is a simple command that will allow you to query status of indexes
+directly from Splunk.
+
+In order to use the command simply search for "| getindex".
+The command will return status of all indexes, including the following
+information:
+
+- Index name
+- Retention time in days
+- Current size in MB
+- Is the index internal or not?
+- Local path of the index
+- Archive directory (if set)
+- First and last event time
+
+The command needs the Splunk Python SDK. Install it into the following
+directory:
+   $SPLUNK_HOME/lib/python2.7/site-packages/splunklib
+
+Splunk Python SDK is available from:
+http://dev.splunk.com/goto/sdk-python
+
+A simple dashboard with a table showing the indexes is available too.
+
+Enjoy!
+
