@@ -1,0 +1,6 @@
+index=aos_core a=servicedebugger logger="com.apple.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT"
+| regex _raw="service>.*\"; vip.*vip: (?<vip>.*); status.*status: (?<status>.*)\";"
+| search service=ARDeliveryService vip="https://ardeliveryservice.pd04aws.aosp.apple.com/graphql" status="DOWN"
+| transaction service, vip maxspan=1h startswith=eval(status="DOWN") endswith=eval(status!="DOWN")
+| eval duration=if(duration>3600, "Alert", "OK")
+| table _time, service, vip, status, duration
