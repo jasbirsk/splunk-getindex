@@ -1,8 +1,9 @@
-index=aos_core a=servicedebugger logger="com.xyz.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT"
-| rex "vip: {}=\"(?<vip>.*)\"; status"  | rex "status: {}=\"(?<status>.*)\"; " 
-| search service=ARDeliveryService vip="https://ardeliveryservice.pd04aws.aosp.xyz.com/graphql"
-| where _time >= relative_time(now(), "-1h") AND status="DOWN"
+index=aos_core a=servicedebugger logger="com.apple.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT"
+| rex "service>.*\"; vip.*vip: (?<vip>.*); status.*status: (?<status>.*)\";"
+| search service=ARDeliveryService vip="https://ardeliveryservice.pd04aws.aosp.apple.com/graphql"
+| where _time >= relative_time(now(), "-1h")
+| eval status=if(status="DOWN", "DOWN", "UP")
 | bin _time span=15m
-| stats count as DownCount by _time, service, vip, status
-| where DownCount > 0
-| table _time, service, vip, status, DownCount
+| stats count(eval(status="DOWN")) as DownCount by _time, service, vip
+| eval "service is UP" = if(DownCount=0, "YES", "NO")
+| table _time, service, vip, DownCount, "service is UP"
