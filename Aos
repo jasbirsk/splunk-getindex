@@ -1,7 +1,7 @@
-index="your_index" your_field="your_value" earliest=-24h@h latest=now
-| bin _time span=1h
-| stats first(_time) as first_time last(_time) as last_time by _time
-| join type=left _time [ search index="your_index" your_field="your_value" earliest=-24h@h latest=now | bucket _time span=1h | stats first(_raw) as first_event_raw last(_raw) as last_event_raw by _time ]
-| eval first_event=strftime(first_time, "%Y-%m-%d %H:%M:%S")
-| eval last_event=strftime(last_time, "%Y-%m-%d %H:%M:%S")
-| table _time first_event last_event first_event_raw last_event_raw
+index=aos_core a=servicedebugger logger="com.apple.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT"
+| rex "service>.*\"; vip.*vip: (?<vip>.*); status.*status: (?<status>.*)\";"
+| search service=ARDeliveryService vip="https://ardeliveryservice.pd04aws.aosp.apple.com/graphql" status="DOWN"
+| transaction service, vip maxspan=1h maxpause=15m
+| where duration >= 3600
+| eval alert="Service DOWN for more than 1 hour"
+| table _time, service, vip, status, alert
