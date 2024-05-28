@@ -1,7 +1,4 @@
-index=aos_core a=servicedebugger logger="com.apple.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT"
-| rex "service>.*\"; vip.*vip: (?<vip>.*); status.*status: (?<status>.*)\";"
-| search service=ARDeliveryService vip="https://ardeliveryservice.pd04aws.aosp.apple.com/graphql" status="DOWN"
-| transaction service, vip maxspan=1h maxpause=15m
-| where duration >= 3600
-| eval alert="Service DOWN for more than 1 hour"
+index=aos_core a=servicedebugger logger="com.apple.store.platform.servicedebugger.services.HealthCheckService" "SD_VIP_HEALTH_CHECK_AUDIT" 
+| rex "service: {}=\"(?<service>.*)\"; vip" | rex "vip: {}=\"(?<vip>.*)\"; status"  | rex "status: {}=\"(?<status>.*)\"; "  
+| search status="DOWN"  service=AssetService  vip="https://store-svc-pbxdv01aws.ucp.apple.com:9999/8235/service/asset" | transaction service, vip maxspan=1h maxpause=15m| eval duration=if(duration>3600, "Alert", "OK")|where duration >= 3600| eval alert="Service DOWN for more than 1 hour"
 | table _time, service, vip, status, alert
